@@ -1,43 +1,28 @@
-'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { History, Search, MessageSquare, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
-
-const historyItems = [
-  {
-    id: 1,
-    title: 'MTH 101 Quiz Preparation',
-    snippet: 'The derivative of a constant is always zero...',
-    date: '2 hours ago',
-    messages: 14,
-  },
-  {
-    id: 2,
-    title: 'Industrial Attachment Application',
-    snippet: 'To the Human Resources Manager, I am writing to...',
-    date: 'Yesterday',
-    messages: 6,
-  },
-  {
-    id: 3,
-    title: 'GNS 201 Term Paper Outline',
-    snippet: '1. Introduction to Digital Citizenship in Nigeria...',
-    date: 'May 02, 2024',
-    messages: 22,
-  },
-  {
-    id: 4,
-    title: 'Course Registration Issues',
-    snippet: 'How do I resolve the "Unit Overload" error on the portal?',
-    date: 'April 28, 2024',
-    messages: 3,
-  },
-];
+import { api } from '@/lib/api';
 
 export default function ChatHistoryPage() {
+  const [historyItems, setHistoryItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/api/chat/history/')
+      .then(data => {
+        setHistoryItems(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to fetch history:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return <div className="p-8 text-center animate-pulse">Loading history...</div>;
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-700">
       <section className="flex flex-col md:flex-row md:items-center justify-between gap-4">

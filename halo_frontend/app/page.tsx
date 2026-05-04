@@ -5,22 +5,52 @@ import { ChatInput } from '@/components/chat/ChatInput';
 import { ChatMessage } from '@/components/chat/ChatMessage';
 import { Sparkles } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { api } from '@/lib/api';
 
 export default function DashboardPage() {
   const [messages, setMessages] = useState<any[]>([]);
 
-  const handleSend = (content: string, attachments?: any[]) => {
+  const handleSend = async (content: string, attachments?: any[]) => {
     const userMessage = { role: 'user', content, attachments };
     setMessages((prev) => [...prev, userMessage]);
 
-    // Dummy AI Response
-    setTimeout(() => {
-      const aiMessage = { 
-        role: 'assistant', 
-        content: `I've received your message${attachments && attachments.length > 0 ? ` and ${attachments.length} attachment(s)` : ''}: "${content}". As an AI assistant for LASUSTECH, I can help you analyze documents, course details, and more. How would you like to proceed?` 
-      };
-      setMessages((prev) => [...prev, aiMessage]);
-    }, 1000);
+    // Create a placeholder for the AI response
+    const aiMessageId = Date.now();
+    setMessages((prev) => [...prev, { id: aiMessageId, role: 'assistant', content: '' }]);
+
+    let fullResponse = "";
+    try {
+      await api.chatStream(content, messages, (chunk) => {
+        // The backend sends 'data: {"text": "..."}'
+        const lines = chunk.split('\n');
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.replace('data: ', ''));
+              fullResponse += data.text;
+              
+              setMessages((prev) => {
+                const newMessages = [...prev];
+                const aiMsgIndex = newMessages.findIndex(m => m.id === aiMessageId);
+                if (aiMsgIndex !== -1) {
+                  newMessages[aiMsgIndex] = { ...newMessages[aiMsgIndex], content: fullResponse };
+                }
+                return newMessages;
+              });
+            } catch (e) {
+              // Handle potential parse errors or end-of-stream markers
+              if (line.includes('[DONE]')) break;
+            }
+          }
+        }
+      });
+    } catch (error) {
+      console.error("Chat error:", error);
+      setMessages((prev) => [
+        ...prev.filter(m => m.id !== aiMessageId),
+        { role: 'assistant', content: "Sorry, I encountered an error connecting to the LASUSTECH AI core. Please try again later." }
+      ]);
+    }
   };
 
   return (

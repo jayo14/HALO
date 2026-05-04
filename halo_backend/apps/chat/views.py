@@ -5,7 +5,7 @@ from django.http import StreamingHttpResponse
 from django.db import connection
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from .utils import similarity_search, build_context, call_claude_stream, log_conversation
 from apps.knowledge.utils import embed_text
 
@@ -89,3 +89,21 @@ class ChatQueryView(APIView):
             )
             count = cursor.fetchone()[0]
             return count <= limit
+class ChatHistoryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT id, query, response, created_at FROM conversation_logs WHERE user_id=%s ORDER BY created_at DESC",
+                [request.user.username]
+            )
+            rows = cursor.fetchall()
+            return Response([
+                {
+                    "id": r[0],
+                    "title": r[1][:50] + "..." if len(r[1]) > 50 else r[1],
+                    "snippet": r[2][:100] + "..." if len(r[2]) > 100 else r[2],
+                    "date": r[3]
+                } for r in rows
+            ])

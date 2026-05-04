@@ -1,5 +1,4 @@
-'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Label } from '@/components/ui/label';
@@ -8,8 +7,26 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { User, Mail, School, BookOpen, Calendar, MapPin, Camera, Sparkles } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { api } from '@/lib/api';
 
 export default function ProfilePage() {
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/api/students/profile/')
+      .then(data => {
+        setProfile(data.profile);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to fetch profile:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return <div className="p-8 text-center animate-pulse">Loading profile...</div>;
+  if (!profile) return <div className="p-8 text-center">No profile found. Please login.</div>;
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-700">
       <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
@@ -27,24 +44,18 @@ export default function ProfilePage() {
         
         <div className="flex-1 text-center md:text-left space-y-4">
           <div className="space-y-1">
-            <h1 className="text-4xl font-bold tracking-tight">John Doe</h1>
+            <h1 className="text-4xl font-bold tracking-tight">{profile.full_name || 'Student Name'}</h1>
             <p className="text-muted-foreground flex items-center justify-center md:justify-start gap-2">
               <Mail size={16} />
-              johndoe@lasustech.edu.ng
+              {profile.school_email || 'No email provided'}
             </p>
           </div>
           <div className="flex flex-wrap justify-center md:justify-start gap-2">
-            <Badge variant="secondary" className="px-3 py-1">Mechanical Engineering</Badge>
-            <Badge variant="outline" className="px-3 py-1">Year 3 (300 Level)</Badge>
-            <Badge className="bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border-emerald-500/20 px-3 py-1">Verified Student</Badge>
-          </div>
-          <div className="flex flex-wrap justify-center md:justify-start gap-6 pt-2">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <School size={16} /> Faculty of Engineering
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <MapPin size={16} /> Ikorodu Campus
-            </div>
+            <Badge variant="secondary" className="px-3 py-1">{profile.department || 'Not Assigned'}</Badge>
+            <Badge variant="outline" className="px-3 py-1">{profile.level || 'Unknown Level'}</Badge>
+            <Badge className="bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border-emerald-500/20 px-3 py-1">
+              {profile.role === 'verified_student' ? 'Verified Student' : 'Public User'}
+            </Badge>
           </div>
         </div>
       </div>
@@ -58,27 +69,18 @@ export default function ProfilePage() {
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="first-name">First Name</Label>
-                <Input id="first-name" defaultValue="John" />
+                <Label htmlFor="first-name">Full Name</Label>
+                <Input id="first-name" defaultValue={profile.full_name} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="last-name">Last Name</Label>
-                <Input id="last-name" defaultValue="Doe" />
+                <Label htmlFor="matric">Matric Number</Label>
+                <Input id="matric" defaultValue={profile.matric_number} disabled />
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="bio">Bio</Label>
-              <textarea 
-                id="bio"
-                className="w-full min-h-[100px] p-3 rounded-lg border border-input bg-transparent text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-                placeholder="Tell us a bit about yourself..."
-                defaultValue="Aspiring Mechanical Engineer at LASUSTECH. Passionate about robotics and AI in manufacturing."
-              />
             </div>
             <Separator className="opacity-50" />
             <div className="space-y-2">
               <Label htmlFor="department">Department</Label>
-              <Input id="department" defaultValue="Mechanical Engineering" disabled />
+              <Input id="department" defaultValue={profile.department} disabled />
             </div>
           </CardContent>
           <CardFooter className="bg-muted/30 py-4">
