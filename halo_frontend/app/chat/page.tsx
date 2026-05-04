@@ -1,3 +1,4 @@
+'use client';
 import React, { useEffect, useState } from 'react';
 import { History, Search, MessageSquare, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
