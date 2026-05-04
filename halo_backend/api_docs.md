@@ -7,6 +7,11 @@
 Most endpoints require a Supabase JWT passed in the `Authorization` header:
 `Authorization: Bearer <JWT_TOKEN>`
 
+## Interactive Documentation
+- **Swagger UI:** `/api/docs/`
+- **Redoc:** `/api/redoc/`
+- **OpenAPI Schema:** `/api/schema/`
+
 ---
 
 ## 1. Chat
