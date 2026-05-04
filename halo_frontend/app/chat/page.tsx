@@ -1,59 +1,99 @@
 'use client';
-import { ChatWindow } from '@/components/chat/ChatWindow';
-import { ChatInput } from '@/components/chat/ChatInput';
-import { Sparkles, History, Pin } from 'lucide-react';
+import React from 'react';
+import { History, Search, MessageSquare, Trash2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import Link from 'next/link';
 
-export default function ChatPage() {
+const historyItems = [
+  {
+    id: 1,
+    title: 'MTH 101 Quiz Preparation',
+    snippet: 'The derivative of a constant is always zero...',
+    date: '2 hours ago',
+    messages: 14,
+  },
+  {
+    id: 2,
+    title: 'Industrial Attachment Application',
+    snippet: 'To the Human Resources Manager, I am writing to...',
+    date: 'Yesterday',
+    messages: 6,
+  },
+  {
+    id: 3,
+    title: 'GNS 201 Term Paper Outline',
+    snippet: '1. Introduction to Digital Citizenship in Nigeria...',
+    date: 'May 02, 2024',
+    messages: 22,
+  },
+  {
+    id: 4,
+    title: 'Course Registration Issues',
+    snippet: 'How do I resolve the "Unit Overload" error on the portal?',
+    date: 'April 28, 2024',
+    messages: 3,
+  },
+];
+
+export default function ChatHistoryPage() {
   return (
-    <div className="flex h-[calc(100vh-64px)] overflow-hidden">
-      {/* Sidebar for Chat - Internal */}
-      <aside className="w-64 border-r bg-muted/20 hidden xl:flex flex-col">
-        <div className="p-6 border-b flex items-center justify-between">
-          <h2 className="font-semibold text-sm flex items-center gap-2">
-            <History size={16} className="text-muted-foreground" />
-            History
-          </h2>
+    <div className="p-8 max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-700">
+      <section className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+            <History className="text-primary" size={28} />
+            Chat History
+          </h1>
+          <p className="text-muted-foreground">Access and manage your previous conversations with HALO.</p>
         </div>
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
-          <div className="p-3 rounded-lg bg-card border shadow-sm cursor-pointer hover:border-primary/50 transition-all">
-            <p className="text-xs font-medium truncate">MTH 101 Quiz Prep</p>
-            <span className="text-[10px] text-muted-foreground">2 hours ago</span>
-          </div>
-          <div className="p-3 rounded-lg hover:bg-accent cursor-pointer transition-all">
-            <p className="text-xs font-medium truncate">Industrial Attachment Letter</p>
-            <span className="text-[10px] text-muted-foreground">Yesterday</span>
-          </div>
+        <div className="relative w-full md:w-80">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+          <Input placeholder="Search history..." className="pl-10 h-10 rounded-lg bg-card/50" />
         </div>
-        <div className="p-6 border-t">
-          <h2 className="font-semibold text-sm flex items-center gap-2 mb-4">
-            <Pin size={16} className="text-muted-foreground" />
-            Pinned Topics
-          </h2>
-          <div className="space-y-2">
-            <span className="inline-flex items-center px-2 py-1 rounded-md bg-primary/10 text-primary text-[10px] font-bold border border-primary/20">
-              Physics 101
-            </span>
-          </div>
-        </div>
-      </aside>
+      </section>
 
-      {/* Main Chat Area */}
-      <main className="flex-1 flex flex-col relative">
-        <header className="px-6 py-4 border-b flex items-center justify-between bg-background/80 backdrop-blur sticky top-0 z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-              <Sparkles size={18} />
-            </div>
-            <div>
-              <h1 className="text-sm font-bold leading-none">New Conversation</h1>
-              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mt-1">Chatting with HALO v1.2</p>
-            </div>
-          </div>
-        </header>
+      <div className="space-y-4 pb-12">
+        {historyItems.map((item) => (
+          <Card key={item.id} className="hover:border-primary/30 transition-all cursor-pointer group bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4 overflow-hidden">
+                  <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:scale-110 transition-transform">
+                    <MessageSquare size={20} />
+                  </div>
+                  <div className="overflow-hidden">
+                    <h3 className="font-semibold truncate">{item.title}</h3>
+                    <p className="text-sm text-muted-foreground truncate">{item.snippet}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 shrink-0">
+                  <div className="text-right hidden sm:block">
+                    <p className="text-xs font-medium">{item.date}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase">{item.messages} messages</p>
+                  </div>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10">
+                    <Trash2 size={16} />
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
 
-        <ChatWindow />
-        <ChatInput />
-      </main>
+        {historyItems.length === 0 && (
+          <div className="text-center py-20 space-y-4">
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto text-muted-foreground">
+              <History size={32} />
+            </div>
+            <p className="text-muted-foreground font-medium">No conversation history yet.</p>
+            <Link href="/">
+              <Button variant="outline">Start your first chat</Button>
+            </Link>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

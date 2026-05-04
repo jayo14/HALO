@@ -3,24 +3,12 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { navItems } from '@/lib/navigation';
 import {
-  MessageSquare,
-  Mail,
-  BookOpen,
-  Newspaper,
   Settings,
-  Home,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
-
-const navItems = [
-  { name: 'Dashboard', href: '/', icon: Home },
-  { name: 'Chat', href: '/chat', icon: MessageSquare },
-  { name: 'Email Assistant', href: '/email', icon: Mail },
-  { name: 'Knowledge Base', href: '/knowledge', icon: BookOpen },
-  { name: 'News', href: '/news', icon: Newspaper },
-];
 
 export const Sidebar = () => {
   const pathname = usePathname();
@@ -28,7 +16,7 @@ export const Sidebar = () => {
 
   return (
     <aside className={cn(
-      "h-screen sticky top-0 border-r bg-card transition-all duration-300 flex flex-col",
+      "h-screen sticky top-0 border-r bg-card transition-all duration-300 hidden md:flex flex-col",
       isCollapsed ? "w-16" : "w-64"
     )}>
       <div className="p-4 flex items-center justify-between">

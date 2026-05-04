@@ -5,8 +5,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { ArrowUp, Paperclip, Mic } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export const ChatInput = () => {
+export const ChatInput = ({ onSend }: { onSend: (message: string) => void }) => {
   const [input, setInput] = useState('');
+
+  const handleSend = () => {
+    if (!input.trim()) return;
+    onSend(input);
+    setInput('');
+  };
 
   return (
     <div className="relative w-full max-w-3xl mx-auto group">
@@ -23,8 +29,7 @@ export const ChatInput = () => {
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
-              // Handle send
-              setInput('');
+              handleSend();
             }
           }}
         />
@@ -39,6 +44,7 @@ export const ChatInput = () => {
           </div>
           <Button 
             size="icon" 
+            onClick={handleSend}
             className={cn(
               "h-9 w-9 rounded-full transition-all duration-300",
               input.trim() ? "bg-primary text-primary-foreground scale-100" : "bg-muted text-muted-foreground opacity-30 scale-90"
