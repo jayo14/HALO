@@ -9,15 +9,15 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 export default function DashboardPage() {
   const [messages, setMessages] = useState<any[]>([]);
 
-  const handleSend = (content: string) => {
-    const userMessage = { role: 'user', content };
+  const handleSend = (content: string, attachments?: any[]) => {
+    const userMessage = { role: 'user', content, attachments };
     setMessages((prev) => [...prev, userMessage]);
 
     // Dummy AI Response
     setTimeout(() => {
       const aiMessage = { 
         role: 'assistant', 
-        content: `I've received your message: "${content}". As an AI assistant for LASUSTECH, I can help you with course details, exam schedules, and formal academic documentation. How would you like to proceed?` 
+        content: `I've received your message${attachments && attachments.length > 0 ? ` and ${attachments.length} attachment(s)` : ''}: "${content}". As an AI assistant for LASUSTECH, I can help you analyze documents, course details, and more. How would you like to proceed?` 
       };
       setMessages((prev) => [...prev, aiMessage]);
     }, 1000);
@@ -54,7 +54,12 @@ export default function DashboardPage() {
           <ScrollArea className="flex-1 w-full">
             <div className="pb-32">
               {messages.map((msg, idx) => (
-                <ChatMessage key={idx} role={msg.role} content={msg.content} />
+                <ChatMessage 
+                  key={idx} 
+                  role={msg.role} 
+                  content={msg.content} 
+                  attachments={msg.attachments} 
+                />
               ))}
             </div>
           </ScrollArea>
