@@ -1,107 +1,57 @@
 'use client';
-import React, { useState, useRef, useEffect } from 'react';
-import { useChatStore } from '@/store/chatStore';
-import { Send, Paperclip, Mic } from 'lucide-react';
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { ArrowUp, Paperclip, Mic } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export const ChatInput = () => {
   const [input, setInput] = useState('');
-  const { messages, addMessage, setTyping } = useChatStore();
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'inherit';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-  }, [input]);
-
-  const handleSend = async () => {
-    if (!input.trim()) return;
-
-    const userMessage = input;
-    setInput('');
-    addMessage({ role: 'user', content: userMessage });
-    setTyping(true);
-
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_DJANGO_API_URL}/api/chat/query/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage, history: messages.slice(-6) }),
-      });
-
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let assistantContent = '';
-
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          const chunk = decoder.decode(value);
-          const lines = chunk.split('\n\n');
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const dataStr = line.replace('data: ', '');
-              if (dataStr === '[DONE]') break;
-              try {
-                const data = JSON.parse(dataStr);
-                assistantContent += data.text;
-              } catch (e) {}
-            }
-          }
-        }
-        addMessage({ role: 'assistant', content: assistantContent });
-      }
-    } catch (error) {
-      console.error('Chat error:', error);
-    } finally {
-      setTyping(false);
-    }
-  };
 
   return (
-    <div className="p-6 bg-gradient-to-t from-background via-background to-transparent">
-      <div className="max-w-3xl mx-auto relative group">
-        <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-2xl blur opacity-25 group-focus-within:opacity-100 transition duration-1000 group-focus-within:duration-200"></div>
-        <div className="relative bg-card border rounded-2xl shadow-xl overflow-hidden flex flex-col">
-          <textarea
-            ref={textareaRef}
-            rows={1}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
-            placeholder="Ask Halo anything about LASUSTECH..."
-            className="w-full bg-transparent p-4 pr-16 resize-none outline-none text-sm min-h-[56px] max-h-[200px]"
-          />
-          <div className="flex items-center justify-between px-4 py-2 bg-muted/30 border-t">
-            <div className="flex items-center gap-2">
-              <button className="p-2 rounded-md hover:bg-accent text-muted-foreground transition-colors">
-                <Paperclip size={18} />
-              </button>
-              <button className="p-2 rounded-md hover:bg-accent text-muted-foreground transition-colors">
-                <Mic size={18} />
-              </button>
-            </div>
-            <button
-              onClick={handleSend}
-              disabled={!input.trim()}
-              className={cn(
-                "p-2 rounded-lg transition-all",
-                input.trim()
-                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-100"
-                  : "bg-muted text-muted-foreground scale-90"
-              )}
-            >
-              <Send size={18} />
-            </button>
+    <div className="relative w-full max-w-3xl mx-auto group">
+      <div className="relative flex flex-col w-full p-2 overflow-hidden rounded-3xl border bg-card/50 backdrop-blur-xl focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/30 transition-all duration-300 shadow-2xl shadow-primary/5">
+        <Textarea
+          placeholder="Message HALO..."
+          className="min-h-[60px] max-h-[200px] w-full resize-none border-0 bg-transparent px-4 py-3 focus-visible:ring-0 text-lg placeholder:text-muted-foreground/50"
+          value={input}
+          onChange={(e) => {
+            setInput(e.target.value);
+            e.target.style.height = 'auto';
+            e.target.style.height = `${e.target.scrollHeight}px`;
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              // Handle send
+              setInput('');
+            }
+          }}
+        />
+        <div className="flex items-center justify-between px-2 pb-1">
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent/50">
+              <Paperclip size={20} />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent/50">
+              <Mic size={20} />
+            </Button>
           </div>
+          <Button 
+            size="icon" 
+            className={cn(
+              "h-9 w-9 rounded-full transition-all duration-300",
+              input.trim() ? "bg-primary text-primary-foreground scale-100" : "bg-muted text-muted-foreground opacity-30 scale-90"
+            )}
+            disabled={!input.trim()}
+          >
+            <ArrowUp size={20} strokeWidth={3} />
+          </Button>
         </div>
-        <p className="text-[10px] text-center mt-3 text-muted-foreground font-medium uppercase tracking-widest">
-          Press Enter to send • Shift + Enter for new line
-        </p>
       </div>
+      <p className="mt-3 text-center text-[11px] text-muted-foreground/60 tracking-wide">
+        HALO is an AI assistant for LASUSTECH students. Accuracy may vary.
+      </p>
     </div>
   );
 };

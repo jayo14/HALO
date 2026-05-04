@@ -1,52 +1,34 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { QuickActions } from '@/components/dashboard/QuickActions';
-import { RecentActivity } from '@/components/dashboard/RecentActivity';
+import { ChatInput } from '@/components/chat/ChatInput';
 import { Sparkles } from 'lucide-react';
 
 export default function DashboardPage() {
   return (
-    <div className="p-8 max-w-6xl mx-auto space-y-12">
-      <section className="space-y-4">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider">
-          <Sparkles size={12} />
-          Your Academic Assistant
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] p-6 max-w-4xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+      <section className="text-center space-y-6">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-primary text-[13px] font-medium tracking-tight shadow-sm backdrop-blur-sm">
+          <Sparkles size={14} className="animate-pulse" />
+          LASUSTECH Academic Assistant
         </div>
-        <h1 className="text-4xl font-bold tracking-tight">
-          Good morning. <br />
-          <span className="text-muted-foreground">How can HALO help with your LASUSTECH studies today?</span>
-        </h1>
+        <div className="space-y-3">
+          <h1 className="text-5xl font-bold tracking-tight bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent pb-1">
+            How can HALO help?
+          </h1>
+          <p className="text-lg text-muted-foreground font-medium max-w-lg mx-auto leading-relaxed">
+            Instant support for your studies, from course details to formal email drafts.
+          </p>
+        </div>
       </section>
 
-      <section className="space-y-6">
-        <h2 className="text-lg font-semibold text-muted-foreground uppercase tracking-widest text-xs">Quick Actions</h2>
-        <QuickActions />
+      <section className="w-full max-w-3xl space-y-8">
+        <ChatInput />
+        <div className="pt-4">
+          <QuickActions />
+        </div>
       </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <section className="lg:col-span-2 space-y-6">
-          <h2 className="text-lg font-semibold text-muted-foreground uppercase tracking-widest text-xs">Recent Conversations</h2>
-          <RecentActivity />
-        </section>
-
-        <section className="space-y-6">
-          <h2 className="text-lg font-semibold text-muted-foreground uppercase tracking-widest text-xs">University Updates</h2>
-          <Card className="p-6 space-y-4">
-            <div className="space-y-2">
-              <span className="text-[10px] font-bold text-primary uppercase">Academic Calendar</span>
-              <p className="text-sm font-medium leading-snug">First semester examination begins June 10th, 2024.</p>
-            </div>
-            <div className="h-px bg-border" />
-            <div className="space-y-2">
-              <span className="text-[10px] font-bold text-orange-500 uppercase">Alert</span>
-              <p className="text-sm font-medium leading-snug">Hostel portal closes this Friday at 11:59 PM.</p>
-            </div>
-            <Button variant="secondary" size="sm" className="w-full">
-              Read all news
-            </Button>
-          </Card>
-        </section>
-      </div>
+      {/* Subtle background glow */}
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
     </div>
   );
 }

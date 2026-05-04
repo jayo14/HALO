@@ -18,7 +18,7 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        sans: ["Outfit", "sans-serif"],
+        sans: ["var(--font-dm-sans)", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
